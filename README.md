@@ -31,7 +31,7 @@ Tkinter ships with most standard Python installations. On some Linux distributio
 ```bash
 git clone https://github.com/ahmad019/MZI-MRR-GUI.git
 cd MZI-MRR-GUI
-pip install numpy matplotlib sympy pandas openpyxl
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ pip install numpy matplotlib sympy pandas openpyxl
 Run the program with:
 
 ```bash
-python "MZI- GUI program -Final.py"
+python mzi_gui.py
 ```
 
 This opens the main window with a control panel on the left and a 6-panel plot view on the right.
@@ -72,6 +72,10 @@ This opens the main window with a control panel on the left and a 6-panel plot v
 
 Coupling state is reported live in the status bar as **OC** (overcoupled, r < a) or **UC** (undercoupled, r > a).
 
+## Author
+
+Ahmad B. Yousafzai
+
 ## License
 
-No license specified yet — all rights reserved by default until one is added.
+Released under the [MIT License](LICENSE) — free to use, modify, and distribute, including for teaching and research.

@@ -2,6 +2,8 @@
 
 A desktop GUI for simulating and visualizing the optical response of a Mach-Zehnder Interferometer (MZI) coupled to one or two ring resonators. Built with Python, Tkinter, and SymPy/NumPy for the underlying physics, it lets you sweep parameters interactively and see the output intensity, phase, group index, and group velocity update live.
 
+![MZI Ring Resonator Analysis Tool screenshot](assets/screenshot.png)
+
 ## Features
 
 - **Three coupling configurations**

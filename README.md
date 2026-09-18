@@ -59,6 +59,16 @@ This opens the main window with a control panel on the left and a 6-panel plot v
 | B | Resonator 1 coupled, resonator 2 inserted | Requires r4 for the reflection arm |
 | C | Both resonators inserted | Requires r3 and r4; uses reflection phase for both arms |
 
+**Config A — Both resonators side-coupled**
+
+![Config A schematic](assets/config-A.jpg)
+
+**Config B — Resonator 1 side-coupled, resonator 2 inserted**
+
+![Config B schematic](assets/config-B.jpg)
+
+*(A Config C diagram will be added here in a future update.)*
+
 ## Key Parameters
 
 | Symbol | Meaning |

@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import numpy as np
@@ -192,7 +193,10 @@ class MZIAnalysisGUI:
         # Title
         title_label = ttk.Label(scrollable_frame, text="MZI Analysis Parameters", font=('Arial', 12, 'bold'))
         title_label.pack(pady=(0, 10))
-        
+
+        # System diagram - shows the currently selected optical configuration
+        self.create_system_diagram(scrollable_frame)
+
         # Configuration selection
         config_frame = ttk.LabelFrame(scrollable_frame, text="Configuration", padding=5)
         config_frame.pack(fill=tk.X, pady=(0, 10))
@@ -324,7 +328,69 @@ class MZIAnalysisGUI:
         
         canvas.bind('<Enter>', _bind_to_mousewheel)
         canvas.bind('<Leave>', _unbind_from_mousewheel)
-    
+
+    def create_system_diagram(self, parent):
+        """Create the small panel that shows a schematic of the currently
+        selected optical configuration (A/B/C). Diagrams are pre-drawn
+        images stored in the 'assets' folder next to this script."""
+        diagram_frame = ttk.LabelFrame(parent, text="Current System", padding=5)
+        diagram_frame.pack(fill=tk.X, pady=(0, 10))
+
+        self.diagram_label = ttk.Label(diagram_frame, anchor='center', justify='center')
+        self.diagram_label.pack(fill=tk.BOTH, expand=True)
+
+        # Preload the config diagrams once, keyed by config letter. A config
+        # with no image available (e.g. 'C' until one is provided) simply
+        # won't have an entry, and draw_system_diagram() falls back to a
+        # text description instead.
+        #
+        # These are loaded with Tkinter's own built-in PhotoImage (PNG only)
+        # rather than Pillow's ImageTk, since ImageTk requires Pillow's Tk
+        # bindings to exactly match the Tcl/Tk build Python is linked
+        # against. That mismatch is a common source of a cryptic
+        # "TclError: Bad mode" crash, especially in conda/Anaconda
+        # environments (e.g. Spyder) where Pillow was installed via pip.
+        # Using tk.PhotoImage avoids that dependency entirely. The images
+        # are pre-sized to the panel width ahead of time (see assets/ —
+        # regenerate with Pillow offline if you replace them).
+        self.config_images = {}
+        assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
+        image_files = {'A': 'config-A.png', 'B': 'config-B.png', 'C': 'config-C.png'}
+
+        for cfg, filename in image_files.items():
+            path = os.path.join(assets_dir, filename)
+            if not os.path.isfile(path):
+                continue
+            try:
+                self.config_images[cfg] = tk.PhotoImage(file=path)
+            except Exception as e:
+                print(f"Could not load diagram for Config {cfg}: {e}")
+
+    def draw_system_diagram(self):
+        """Update the system panel to match the currently selected
+        configuration (called whenever the plots are recalculated)."""
+        if not hasattr(self, 'diagram_label'):
+            return
+
+        config = self.config.get()
+        img = self.config_images.get(config)
+
+        if img is not None:
+            self.diagram_label.configure(image=img, text='')
+            self.diagram_label.image = img  # keep a reference so it isn't garbage-collected
+        else:
+            config_desc = {
+                'A': 'Both resonators side-coupled',
+                'B': 'Res1 side-coupled, Res2 inserted',
+                'C': 'Both resonators inserted'
+            }
+            self.diagram_label.configure(
+                image='',
+                text=f"Config {config}: {config_desc.get(config, '')}\n\n(diagram not yet available)",
+                font=('Arial', 9)
+            )
+            self.diagram_label.image = None
+
     def create_slider_with_entry(self, parent, label, variable, min_val, max_val, resolution, scientific=False, scale=1):
         """Create a slider with editable entry box"""
         frame = ttk.Frame(parent)
@@ -867,6 +933,7 @@ class MZIAnalysisGUI:
         
         # Update canvas
         self.canvas.draw()
+        self.draw_system_diagram()
         self.status_text.set("Plots updated")
     
     def show_zoomed(self):
